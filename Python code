@@ -1,0 +1,68 @@
+# Install necessary libraries if not already installed (uncomment to run in Jupyter)
+# !pip install biopython pandas matplotlib  # Install Biopython, Pandas, Matplotlib
+
+from Bio import Entrez, SeqIO  # Import Entrez for NCBI API access, SeqIO for parsing sequence files
+import pandas as pd           # Pandas for structured data handling
+import matplotlib.pyplot as plt  # Matplotlib for plotting graphs
+import numpy as np            # NumPy for numerical operations (dependency, optional here)
+
+# Set your email here; NCBI requires it for API usage
+Entrez.email = "your.email@example.com"  # Replace with your actual email address
+
+# Function to fetch sequences from NCBI nucleotide database using accession numbers
+def fetch_sequences(accessions):
+    sequences = []  # List to store fetched sequences
+    for acc in accessions:  # Loop over each accession number
+        handle = Entrez.efetch(db="nucleotide", id=acc, rettype="fasta", retmode="text")  
+        # efetch: fetches sequence by ID from the nucleotide database in FASTA format (text mode)
+
+        record = SeqIO.read(handle, "fasta")  # Parse the fetched FASTA data into a SeqRecord object
+        sequences.append(record)  # Store the SeqRecord in the list
+        handle.close()  # Close the network handle
+    return sequences  # Return the list of sequence records
+
+# Example accession numbers (human and chimpanzee mitochondrial genomes)
+accession_numbers = [
+    "NC_012920.1",  # Homo sapiens mitochondrion, complete genome
+    "NC_001807.4",  # Homo sapiens mitochondrion, revised Cambridge Reference Sequence
+    "NC_011137.1"   # Pan troglodytes mitochondrion, complete genome
+]
+
+# Fetch sequences from NCBI based on the above accession list
+seq_records = fetch_sequences(accession_numbers)
+
+# Function to calculate nucleotide composition in percentages
+def nucleotide_composition(seq_record):
+    seq = str(seq_record.seq).upper()  # Get sequence as a string and convert to uppercase
+    comp = {  # Count each type of nucleotide
+        'A': seq.count('A'),  # Count adenine
+        'T': seq.count('T'),  # Count thymine
+        'G': seq.count('G'),  # Count guanine
+        'C': seq.count('C'),  # Count cytosine
+        'N': seq.count('N')   # Count ambiguous/unknown nucleotides
+    }
+    total = len(seq)  # Total sequence length
+    for base in comp:  # Convert counts to percentages
+        comp[base] = comp[base] / total * 100
+    return comp  # Return dictionary of nucleotide percentages
+
+# List to hold composition data for all sequences
+comp_data = []
+for record in seq_records:  # Loop through each sequence
+    comp = nucleotide_composition(record)  # Calculate composition
+    comp['Sequence'] = record.id  # Add sequence identifier
+    comp_data.append(comp)  # Add to results list
+
+# Convert the results list into a DataFrame
+df_comp = pd.DataFrame(comp_data)
+
+# Plot nucleotide composition as a bar chart
+df_comp.set_index('Sequence', inplace=True)  # Use sequence IDs as DataFrame index
+df_comp.plot(kind='bar', figsize=(10, 6))    # Create a bar chart with size 10x6 inches
+plt.title('Nucleotide Composition (%) for Selected Sequences')  # Plot title
+plt.ylabel('Percentage (%)')     # Y-axis label
+plt.xlabel('Sequence Accession') # X-axis label
+plt.xticks(rotation=45)          # Rotate x-axis labels for readability
+plt.legend(title='Nucleotide')   # Add legend title
+plt.tight_layout()               # Adjust layout to prevent label overlap
+plt.show()                       # Display the plot
