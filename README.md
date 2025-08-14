@@ -27,8 +27,7 @@ pip install biopython pandas matplotlib
 ## 🚀 How to Run
 1. **Clone this repository** (or download the `.py` file):
 git clone [https://github.com/yourusername/your-repo-name.git](https://github.com/Jawad-Alharake/-Biological-Sequence-Retrieval-Analysis-and-Visualization-from-NCBI-/blob/main/Python%20code)
-
-cd your-repo-name
+   cd your-repo-name
 
 
 2. **Edit the script**:
