@@ -72,7 +72,7 @@ This project is released under the MIT License.
 ---
 
 ## 🖋 Author
-Created by Jawad ALHARAKE – [Your Contact/Website]  
+Created by Jawad ALHARAKE – https://www.linkedin.com/in/jawad-alharake  
 If you use it for research or teaching, a mention is appreciated.
 
 
